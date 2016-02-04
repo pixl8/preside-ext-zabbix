@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form i18nBaseUri="system-config.zabbix:">
+	<tab>
+		<fieldset>
+			<field name="sender_executable" required="true" />
+			<field name="remote_server" required="true" />
+			<field name="remote_port" required="true" control="spinner" defaultvalue="10051" maxvalue="999999999" />
+			<field name="application_hostname" required="true" />
+		</fieldset>
+	</tab>
+</form>

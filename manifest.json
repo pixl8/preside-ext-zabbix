@@ -1,0 +1,6 @@
+{
+	  "id"        : "preside-ext-zabbix"
+	, "title"     : "Zabbix Reporting APIs For PresideCMS"
+	, "author"    : ""
+	, "version"   : "1.0.0"
+}
