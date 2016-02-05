@@ -31,5 +31,7 @@ component {
 			, levelMin  = 'FATAL'
 			, levelMax  = 'INFO'
 		};
+
+		interceptorSettings.customInterceptionPoints.append( "onCollectSystemStats" );
 	}
 }
