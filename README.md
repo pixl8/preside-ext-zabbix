@@ -79,7 +79,7 @@ From the root of your application, type the following command:
 
 From the root of your application, type the following command:
 
-    box install pixl8/preside-ext-zabbix#v1.0.0
+    box install pixl8/preside-ext-zabbix#v1.1.0
 
 
 
