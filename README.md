@@ -8,14 +8,16 @@ This is an extension for PresideCMS that provides configuration and an API for r
 
 The extension provides a system configuration screen that allows you to configure:
 
-*Sender executable:* Path to the `zabbix_sender`, e.g. `/usr/bin/zabbix_sender`
-*Remote server:* Hostname or IP address of remote Zabbix server that will receive data
-*Remote port:* Port of the remote Zabbix server that will receive data (default is 10051)
-*Zabbix Hostname:* The hostname of the host, as configured in Zabbix, that all data will be recorded against
+* *Sender executable:* Path to the `zabbix_sender`, e.g. `/usr/bin/zabbix_sender`
+* *Remote server:* Hostname or IP address of remote Zabbix server that will receive data
+* *Remote port:* Port of the remote Zabbix server that will receive data (default is 10051)
+* *Zabbix Hostname:* The hostname of the host, as configured in Zabbix, that all data will be recorded against
 
 ## API
 
-Currently the extension only provides an very basic API through the `ZabbixSender` service. A single `send( data )` method is implemented. Example usage (fictitious):
+### Direct sending of data
+
+The extension provides a single API method through the `ZabbixSender` service, `send( data, keyPrefix="presidecms" )`. Example usage:
 
 ```
 component {
@@ -23,12 +25,36 @@ component {
     property name="syncService"  inject="syncService";
 
     function sendSyncStatsToZabbix() {
-        zabbixSender.send( {
-              "preside[syncfailures]" = syncService.getFailureCount()
-            , "preside[syncqueued]"   = syncService.getQueueCount()
-            , "preside[synctotal]"    = syncService.getTotalProcessedCount()
+        zabbixSender.send( data={
+              syncfailures = syncService.getFailureCount()
+            , syncqueued   = syncService.getQueueCount()
+            , synctotal    = syncService.getTotalProcessedCount()
         } );
     }
+}
+```
+
+All sent data keys are prefixed by default with "presidecms". In the example above, the following variables would be sent to Zabbix: `presidecms[syncfailures]`, `presidecms[syncqueued]`, `presidecms[synctotal]`.
+
+### Provided scheduled task
+
+A scheduled task (requires the Taskmanager preside extension) is supplied that announces a `onCollectSystemStats` interception point in order to gather statistics from the application. To provide statistics in this way, listen for the interception point with an interceptor, e.g.
+
+```
+component {
+
+    property name="taskManagerService" inject="delayedInjector:taskmanagerService";
+
+    public void function configure() output=false {
+        return;
+    }
+
+// listeners
+    public void function onCollectSystemStats( event, interceptData ) {
+        interceptData[ "taskmanager_failure_count" ] = taskManagerService.getFailureCount();
+        // etc.
+    }
+
 }
 ```
 
@@ -53,7 +79,7 @@ From the root of your application, type the following command:
 
 From the root of your application, type the following command:
 
-    box install pixl8/preside-ext-zabbix#v1.0.0
+    box install pixl8/preside-ext-zabbix#v1.1.0
 
 
 
