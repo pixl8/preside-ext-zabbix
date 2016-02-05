@@ -36,7 +36,7 @@ component {
 		}
 
 		if ( canInfo ) {
-			logger.info( "Sending data to Zabbix: [" & SerializeJson( arguments.data ) & "]" );
+			logger.info( "Sending data to Zabbix: [" & SerializeJson( data ) & "]" );
 		}
 
 		try {
@@ -54,7 +54,7 @@ component {
 			}
 		}
 
-		if ( ReFindNoCase( "failed: [1-9]", executionReport ) || findNoCase( "sending failed.", executionReport ) ) {
+		if ( executionReport.findNoCase( "processed: 0" ) || executionReport.findNoCase( "sending failed." ) ) {
 			errorReport = executionReport;
 		}
 
@@ -78,7 +78,7 @@ component {
 		var tmpFile = getTempFile( getTempDirectory(), "zabbixstats" );
 
 		for( var key in arguments.data ) {
-			FileAppend( tmpFile, "- #keyPrefix#[#key#] #arguments.data[ key ]#" );
+			FileAppend( tmpFile, "- #keyPrefix#[#key#] #arguments.data[ key ]#" & Chr( 10 ) );
 		}
 
 		return tmpFile;
