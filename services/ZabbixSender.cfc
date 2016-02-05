@@ -19,12 +19,11 @@ component {
 	}
 
 // PUBLIC API METHODS
-	public void function send( required struct data ) {
-		var tmpFile         = _writeDataToTempFile( data );
+	public boolean function send( required struct data, any logger=_getLogger(), keyPrefix="presidecms" ) {
+		var tmpFile         = _writeDataToTempFile( data, keyPrefix );
 		var configuration   = $getPresideCategorySettings( "zabbix" );
 		var executionReport = "";
 		var errorReport     = "";
-		var logger          = _getLogger();
 		var canError        = logger.canError();
 		var canWarn         = logger.canWarn();
 		var canInfo         = logger.canInfo();
@@ -33,7 +32,11 @@ component {
 			if ( canWarn ) {
 				logger.warn( "The Zabbix integration is not configured." );
 			}
-			return;
+			return false;
+		}
+
+		if ( canInfo ) {
+			logger.info( "Sending data to Zabbix: [" & SerializeJson( arguments.data ) & "]" );
 		}
 
 		try {
@@ -47,26 +50,35 @@ component {
 		} catch ( any e ) {
 			if ( canError ) {
 				logger.error( e.message );
+				return false;
 			}
+		}
+
+		if ( ReFindNoCase( "failed: [1-9]", executionReport ) || findNoCase( "sending failed.", executionReport ) ) {
+			errorReport = executionReport;
 		}
 
 		if ( Len( Trim( errorReport ) ) ) {
 			if ( canError ) {
 				logger.error( errorReport );
+				return false;
 			}
 		} else if ( Len( Trim( executionReport ) ) ) {
 			if ( canInfo ) {
 				logger.info( executionReport );
+				return true;
 			}
 		}
+
+		return false;
 	}
 
 // PRIVATE HELPERS
-	private string function _writeDataToTempFile( required struct data ) {
+	private string function _writeDataToTempFile( required struct data, required string keyPrefix ) {
 		var tmpFile = getTempFile( getTempDirectory(), "zabbixstats" );
 
 		for( var key in arguments.data ) {
-			FileAppend( tmpFile, "- #key# #arguments.data[ key ]#" );
+			FileAppend( tmpFile, "- #keyPrefix#[#key#] #arguments.data[ key ]#" );
 		}
 
 		return tmpFile;
