@@ -21,7 +21,7 @@
  // PUBLIC API METHODS
  	public struct function getStats() {
  		return {
- 			"version" = _getUpdateManagerService().getCurrentVersion()
+ 			"version" = "PresideCMS v" & _getUpdateManagerService().getCurrentVersion()
  		};
  	}
 
