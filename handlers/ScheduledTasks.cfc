@@ -8,7 +8,8 @@
  */
 component {
 
-	property name="zabbixSender" inject="zabbixSender";
+	property name="zabbixSender"      inject="zabbixSender";
+	property name="coreStatsProvider" inject="coreStatsProvider";
 
 	/**
 	 * Gathers statistics from the system and sends them to Zabbix
@@ -22,7 +23,7 @@ component {
 	private boolean function sendStatsToZabbix( event, rc, prc, logger ) {
 		var loggerAvailable = !IsNull( logger );
 		var canWarn         = loggerAvailable && logger.canWarn();
-		var statistics      = {};
+		var statistics      = coreStatsProvider.getStats();
 
 		announceInterception( "onCollectSystemStats", statistics );
 
