@@ -3,7 +3,7 @@
     "version":"1.2.1",
     "author":"Pixl8 Interactive",
     "createPackageDirectory":true,
-    "packageDirectory":"application/extensions/preside-ext-zabbix",
+    "directory":"application/extensions",
     "homepage":"https://github.com/pixl8/preside-ext-zabbix",
     "documentation":"https://github.com/pixl8/preside-ext-zabbix",
     "repository":{
