@@ -2,8 +2,7 @@
     "name":"PresideCMS Extension: Zabbix Reporting APIs For PresideCMS",
     "version":"1.2.1",
     "author":"Pixl8 Interactive",
-    "createPackageDirectory":true,
-    "packageDirectory":"application/extensions/preside-ext-zabbix",
+    "directory":"application/extensions",
     "homepage":"https://github.com/pixl8/preside-ext-zabbix",
     "documentation":"https://github.com/pixl8/preside-ext-zabbix",
     "repository":{
@@ -12,6 +11,7 @@
     },
     "bugs":"https://github.com/pixl8/preside-ext-zabbix",
     "slug":"preside-ext-zabbix",
+    "type":"preside-extensions",
     "projectURL":"https://github.com/pixl8/preside-ext-zabbix",
     "ignore":[
         "**/.*"
