@@ -14,10 +14,11 @@ component {
 	/**
 	 * Gathers statistics from the system and sends them to Zabbix
 	 *
-	 * @displayName Send statistics to Zabbix
-	 * @schedule    0 *\/1 * * * *
-	 * @priority    10
-	 * @timeout     10
+	 * @displayName  Send statistics to Zabbix
+	 * @displayGroup Monitoring
+	 * @schedule     0 *\/1 * * * *
+	 * @priority     10
+	 * @timeout      10
 	 *
 	 */
 	private boolean function sendStatsToZabbix( event, rc, prc, logger ) {
