@@ -30,6 +30,7 @@ component {
 			"version" = "PresideCMS v" & version
 		};
 
+		stats.append( _getCacheStats() );
 		if ( versionIsAtLeast107 ) {
 			stats.append( _getTaskManagerService().getStats() );
 		}
@@ -38,6 +39,31 @@ component {
 	}
 
 // PRIVATE HELPERS
+	private struct function _getCacheStats() {
+		var cachebox   = $getColdbox().getCachebox();
+		var cacheNames = cachebox.getCacheNames();
+		var allStats   = {};
+
+		for( var cacheName in cacheNames ){
+			if ( cachebox.cacheExists( cacheName ) ) {
+				var cache      = cachebox.getCache( cacheName );
+				var config     = cache.getMemento().configuration;
+				var cacheStats = cache.getStats();
+
+				cacheName = LCase( cacheName );
+
+				allStats[ "cache.#cacheName#.objects"    ] = cacheStats.getObjectCount();
+				allStats[ "cache.#cacheName#.maxobjects" ] = Val( config.maxObjects ?: 0 );
+				allStats[ "cache.#cacheName#.hits"       ] = cacheStats.getHits();
+				allStats[ "cache.#cacheName#.misses"     ] = cacheStats.getMisses();
+				allStats[ "cache.#cacheName#.evictions"  ] = cacheStats.getEvictionCount();
+				allStats[ "cache.#cacheName#.perfratio"  ] = cacheStats.getCachePerformanceRatio();
+				allStats[ "cache.#cacheName#.gcs"        ] = cacheStats.getGarbageCollections();
+			}
+		}
+
+		return allStats;
+	}
 
 // GETTERS AND SETTERS
 	private any function _getUpdateManagerService() {
@@ -54,4 +80,4 @@ component {
 		_taskManagerService = arguments.taskManagerService;
 	}
 
- }
+}
