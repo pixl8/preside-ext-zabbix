@@ -20,12 +20,20 @@ component {
 		var wirebox             = arguments.config.wirebox             ?: {};
 		var logbox              = arguments.config.logbox              ?: {};
 		var environments        = arguments.config.environments        ?: {};
+		var coldboxMajorVersion = Val( ListFirst( settings.coldboxVersion ?: "", "." ) );
 
 
-		logbox.appenders.zabbixLogAppender = {
-			  class      = 'coldbox.system.logging.appenders.AsyncRollingFileAppender'
-			, properties = { filePath=settings.logsMapping, filename="zabbix-sender.log" }
-		};
+		if ( coldboxMajorVersion < 4 ) {
+			logbox.appenders.zabbixLogAppender = {
+				  class      = 'coldbox.system.logging.appenders.AsyncRollingFileAppender'
+				, properties = { filePath=settings.logsMapping, filename="zabbix-sender.log" }
+			};
+		} else {
+			logbox.appenders.zabbixLogAppender = {
+				  class      = 'coldbox.system.logging.appenders.RollingFileAppender'
+				, properties = { filePath=settings.logsMapping, async=true, filename="zabbix-sender.log" }
+			};
+		}
 		logbox.categories.zabbixsender = {
 			  appenders = 'zabbixLogAppender'
 			, levelMin  = 'FATAL'
