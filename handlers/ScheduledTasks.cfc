@@ -18,7 +18,7 @@ component {
 	 * @displayGroup Monitoring
 	 * @schedule     0 *\/1 * * * *
 	 * @priority     10
-	 * @timeout      10
+	 * @timeout      600
 	 *
 	 */
 	private boolean function sendStatsToZabbix( event, rc, prc, logger ) {
