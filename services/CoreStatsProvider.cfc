@@ -12,11 +12,19 @@ component {
 	/**
 	 * @updateManagerService.inject updateManagerService
 	 * @taskManagerService.inject   taskManagerService
-	 *
+	 * @configuredFeatures.inject   coldbox:setting:features
+	 * @extensionManager.inject     extensionManagerService
 	 */
-	public any function init( required any updateManagerService, required any taskManagerService ) {
+	public any function init(
+		  required any    updateManagerService
+		, required any    taskManagerService
+		, required any    extensionManager
+		, required struct configuredFeatures
+	) {
 		_setUpdateManagerService( arguments.updateManagerService );
 		_setTaskManagerService( arguments.taskManagerService );
+		_setExtensionManager( arguments.extensionManager );
+		_setConfiguredFeatures( StructKeyArray( arguments.configuredFeatures ) );
 
 		return this;
 	}
@@ -26,11 +34,17 @@ component {
 		var updateManagerService = _getUpdateManagerService();
 		var version              = updateManagerService.getCurrentVersion();
 		var versionIsAtLeast107  = updateManagerService.compareVersions( version, "10.7.0" ) >= 0;
+		var versionIsValid       = ListLen( version, "." ) >= 3;
 		var stats                = {
-			"version" = "PresideCMS v" & version
+			  "version"          = "PresideCMS v" & version
+			, "version.major"    = versionIsValid ? Val( ListGetAt( version, 1, "." ) ) : 0
+			, "version.minor"    = versionIsValid ? Val( ListGetAt( version, 2, "." ) ) : 0
+			, "version.patch"    = versionIsValid ? Val( ListGetAt( version, 3, "." ) ) : 0
+			, "enabled.features" = _getEnabledFeatureList()
 		};
 
 		stats.append( _getCacheStats() );
+		stats.append( _getExtensionDetails() );
 		if ( versionIsAtLeast107 ) {
 			stats.append( _getTaskManagerService().getStats() );
 		}
@@ -65,6 +79,41 @@ component {
 		return allStats;
 	}
 
+	private string function _getEnabledFeatureList() {
+		var configuredFeatures = _getConfiguredFeatures();
+		var enabled = [];
+
+		for( var feature in configuredFeatures ) {
+			if ( $isFeatureEnabled( feature ) ) {
+				enabled.append( feature );
+			}
+		}
+
+		return "," & enabled.toList() & ",";
+	}
+
+	private struct function _getExtensionDetails() {
+		var extensions = _getExtensionManager().listExtensions();
+		var simpleList = [];
+		var details    = {};
+
+		for( var extension in extensions ) {
+			simpleList.append( extension.id );
+			details[ "#extension.id#.version" ] = extension.version;
+			var isValidVersion = ListLen( extension.version, "." ) >= 3;
+
+			if ( isValidVersion ) {
+				details[ "#extension.id#.version.major" ] = ListGetAt( extension.version, 1, "." );
+				details[ "#extension.id#.version.minor" ] = ListGetAt( extension.version, 2, "." );
+				details[ "#extension.id#.version.patch" ] = ListGetAt( extension.version, 3, "." );
+			}
+		}
+		details[ "installed.extensions" ] = "," & simpleList.toList() & ",";
+
+		return details;
+	}
+
+
 // GETTERS AND SETTERS
 	private any function _getUpdateManagerService() {
 		return _updateManagerService;
@@ -80,4 +129,17 @@ component {
 		_taskManagerService = arguments.taskManagerService;
 	}
 
+	private any function _getExtensionManager() {
+		return _extensionManager;
+	}
+	private void function _setExtensionManager( required any extensionManager ) {
+		_extensionManager = arguments.extensionManager;
+	}
+
+	private array function _getConfiguredFeatures() {
+		return _configuredFeatures;
+	}
+	private void function _setConfiguredFeatures( required array configuredFeatures ) {
+		_configuredFeatures = arguments.configuredFeatures;
+	}
 }
