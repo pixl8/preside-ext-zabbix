@@ -93,19 +93,26 @@ component {
 	}
 
 	private struct function _getExtensionDetails() {
-		var extensions = _getExtensionManager().listExtensions();
+		var em         = _getExtensionManager();
+		var extensions = em.listExtensions();
 		var simpleList = [];
 		var details    = {};
 
 		for( var extension in extensions ) {
-			simpleList.append( extension.id );
-			details[ "#extension.id#.version" ] = extension.version;
-			var isValidVersion = ListLen( extension.version, "." ) >= 3;
+			simpleList.append( extension.name );
+			details[ "#extension.name#.version" ] = extension.version ?: "";
+			var isValidVersion = ListLen( details[ "#extension.name#.version" ], "." ) >= 3;
+			if ( !isValidVersion ) {
+				try {
+					details[ "#extension.name#.version" ] = em.getExtensionInfo( extension.name ).version;
+				} catch( "method.no.longer.supported" e ) {}
+				var isValidVersion = ListLen( details[ "#extension.name#.version" ], "." ) >= 3;
+			}
 
 			if ( isValidVersion ) {
-				details[ "#extension.id#.version.major" ] = ListGetAt( extension.version, 1, "." );
-				details[ "#extension.id#.version.minor" ] = ListGetAt( extension.version, 2, "." );
-				details[ "#extension.id#.version.patch" ] = ListGetAt( extension.version, 3, "." );
+				details[ "#extension.name#.version.major" ] = ListGetAt( details[ "#extension.name#.version" ], 1, "." );
+				details[ "#extension.name#.version.minor" ] = ListGetAt( details[ "#extension.name#.version" ], 2, "." );
+				details[ "#extension.name#.version.patch" ] = ListGetAt( details[ "#extension.name#.version" ], 3, "." );
 			}
 		}
 		details[ "installed.extensions" ] = "," & simpleList.toList() & ",";
