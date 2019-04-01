@@ -57,8 +57,14 @@ component {
 		var cachebox   = $getColdbox().getCachebox();
 		var cacheNames = cachebox.getCacheNames();
 		var allStats   = {};
+		var queryCachePerObject = $isFeatureEnabled( "queryCachePerObject" );
 
 		for( var cacheName in cacheNames ){
+			if ( queryCachePerObject ) {
+				if ( cacheName == "DefaultQueryCache" || cacheName.reFindNoCase( "^presideQueryCache_.+" ) ) {
+					continue;
+				}
+			}
 			if ( cachebox.cacheExists( cacheName ) ) {
 				var cache      = cachebox.getCache( cacheName );
 				var config     = cache.getMemento().configuration;
@@ -74,6 +80,18 @@ component {
 				allStats[ "cache.#cacheName#.perfratio"  ] = cacheStats.getCachePerformanceRatio();
 				allStats[ "cache.#cacheName#.gcs"        ] = cacheStats.getGarbageCollections();
 			}
+		}
+
+		if ( queryCachePerObject ) {
+			var cacheStats = $getPresideObjectService().getCacheStats();
+
+			allStats[ "cache.defaultquerycache.objects"    ] = cacheStats.objects;
+			allStats[ "cache.defaultquerycache.maxobjects" ] = cacheStats.maxObjects;
+			allStats[ "cache.defaultquerycache.hits"       ] = cacheStats.hits;
+			allStats[ "cache.defaultquerycache.misses"     ] = cacheStats.misses;
+			allStats[ "cache.defaultquerycache.evictions"  ] = cacheStats.evictions;
+			allStats[ "cache.defaultquerycache.perfratio"  ] = cacheStats.performance;
+			allStats[ "cache.defaultquerycache.gcs"        ] = cacheStats.gcs;
 		}
 
 		return allStats;
