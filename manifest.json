@@ -2,5 +2,5 @@
 	  "id"        : "preside-ext-zabbix"
 	, "title"     : "Zabbix Reporting APIs For PresideCMS"
 	, "author"    : "Pixl8 Interactive"
-	, "version"   : "1.2.11"
+	, "version"   : "1.2.13"
 }
