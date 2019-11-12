@@ -54,7 +54,7 @@ component {
 			}
 		}
 
-		if ( executionReport.findNoCase( "processed: 0" ) || executionReport.findNoCase( "sending failed." ) ) {
+		if ( !ReFindNoCase( "processed: [1-9]", executionReport ) ) {
 			errorReport = executionReport;
 		}
 
