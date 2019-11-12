@@ -36,7 +36,7 @@ component {
 		}
 
 		if ( canInfo ) {
-			logger.info( "Sending data to Zabbix: [" & SerializeJson( data ) & "]" );
+			logger.info( "Sending [#NumberFormat( StructCount( data ) )#] data points to Zabbix..." );
 		}
 
 		try {
